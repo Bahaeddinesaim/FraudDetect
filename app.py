@@ -453,6 +453,130 @@ def normalize_label(label: str) -> str:
     return mapping.get(label, label)
 
 
+DEMO_PROFILES: dict[str, dict[str, float]] = {
+    "Standard": {
+        "V1": 1.1032154353,
+        "V2": -0.0402962146,
+        "V3": 1.2673320886,
+        "V4": 1.2890914696,
+        "V5": -0.7359971636,
+        "V6": 0.288069163,
+        "V7": -0.5860567863,
+        "V8": 0.1893797137,
+        "V9": 0.7823328918,
+        "V10": -0.2679750665,
+        "V11": -0.4503112795,
+        "V12": 0.936707715,
+        "V13": 0.7083804062,
+        "V14": -0.4686472877,
+        "V15": 0.3545740634,
+        "V16": -0.2466346557,
+        "V17": -0.0092123777,
+        "V18": -0.5959124057,
+        "V19": -0.5756816223,
+        "V20": -0.113910177,
+        "V21": -0.0246120063,
+        "V22": 0.1960019528,
+        "V23": 0.0138016541,
+        "V24": 0.103758331,
+        "V25": 0.3642975406,
+        "V26": -0.3822605741,
+        "V27": 0.0928091875,
+        "V28": 0.037050517,
+    },
+    "Montant atypique": {
+        "V1": -0.4921733619,
+        "V2": 1.825168302,
+        "V3": -2.5571997045,
+        "V4": 2.0089219239,
+        "V5": 1.2232980456,
+        "V6": -2.0787619912,
+        "V7": -0.0632775731,
+        "V8": -0.0987833374,
+        "V9": -1.7648701126,
+        "V10": -2.566471432,
+        "V11": 0.9960493023,
+        "V12": -2.6516177588,
+        "V13": -0.0505402478,
+        "V14": -3.7860577405,
+        "V15": 0.4970957487,
+        "V16": -2.1522300355,
+        "V17": -1.8627065995,
+        "V18": -0.4893015935,
+        "V19": 0.5611612729,
+        "V20": 0.3120745689,
+        "V21": 0.5040923295,
+        "V22": 0.6755625162,
+        "V23": -0.1244105766,
+        "V24": -0.2489437868,
+        "V25": -0.636732024,
+        "V26": -0.4829780584,
+        "V27": 0.6297521819,
+        "V28": 0.4754169376,
+    },
+    "Signaux incoherents": {
+        "V1": -1.5636641146,
+        "V2": 2.2992316534,
+        "V3": -3.6016612743,
+        "V4": 1.4612972512,
+        "V5": 0.4938029334,
+        "V6": -1.6074439788,
+        "V7": -1.5244535813,
+        "V8": 0.8166810658,
+        "V9": -2.633926848,
+        "V10": -4.4070255079,
+        "V11": 3.5168132085,
+        "V12": -3.4416941119,
+        "V13": -0.2577844122,
+        "V14": -5.5423572675,
+        "V15": -0.5147410731,
+        "V16": -3.2268268024,
+        "V17": -3.5326163433,
+        "V18": -0.9527719061,
+        "V19": 1.6646053422,
+        "V20": 0.5509431477,
+        "V21": 0.6627737266,
+        "V22": 0.3667412838,
+        "V23": -0.4306487584,
+        "V24": 0.5191115444,
+        "V25": 0.2515797503,
+        "V26": 0.8487225667,
+        "V27": 0.5458924542,
+        "V28": 0.3243396015,
+    },
+    "Cas fortement suspect": {
+        "V1": -14.7246270119,
+        "V2": 7.8751567927,
+        "V3": -21.8723173645,
+        "V4": 11.9061699079,
+        "V5": -8.3487336916,
+        "V6": -2.2628464197,
+        "V7": -15.833442782,
+        "V8": 0.0778736742,
+        "V9": -6.3568334909,
+        "V10": -13.2616517083,
+        "V11": 10.0637897463,
+        "V12": -14.3947668017,
+        "V13": 0.6548887235,
+        "V14": -14.2483158271,
+        "V15": -0.3053607614,
+        "V16": -8.1616324451,
+        "V17": -12.2809648582,
+        "V18": -4.8185863934,
+        "V19": 0.7197876821,
+        "V20": 0.9964687557,
+        "V21": -2.3623449275,
+        "V22": 1.0995572958,
+        "V23": 1.037199423,
+        "V24": -1.0363593418,
+        "V25": -0.2547765142,
+        "V26": 0.642343201,
+        "V27": 2.1611292237,
+        "V28": -1.4012820196,
+    },
+}
+
+
 def risk_color(score: float) -> str:
     if score <= 0.30:
         return "#16A34A"
@@ -585,24 +709,10 @@ with kpi_cols[3]:
 
 
 def make_case(amount: float, hour: int, scenario: str) -> pd.DataFrame:
-    rng = np.random.default_rng(7)
     row = {feature: 0.0 for feature in FEATURES}
+    row.update(DEMO_PROFILES.get(scenario, DEMO_PROFILES["Standard"]))
     row["Amount"] = amount
     row["Time"] = hour * 3600
-    row.update({f"V{i}": rng.normal(0, 0.45) for i in range(1, 29)})
-    if scenario == "Montant atypique":
-        row["V1"], row["V7"], row["V14"] = 1.4, 1.3, -1.4
-    elif scenario == "Signaux incoherents":
-        row["V3"], row["V10"], row["V12"] = -1.6, -2.1, -1.7
-    elif scenario == "Cas fortement suspect":
-        row["V1"], row["V3"], row["V10"], row["V12"], row["V14"], row["V17"] = (
-            2.2,
-            -2.0,
-            -2.7,
-            -2.2,
-            -3.0,
-            -1.6,
-        )
     df = pd.DataFrame([row])
     df["Hour"] = (df["Time"] // 3600) % 24
     df["LogAmount"] = np.log1p(df["Amount"])
@@ -615,40 +725,39 @@ if page == "Scoring agent":
     left, right = st.columns([0.42, 0.58], gap="large")
 
     with left:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("#### Saisie agent")
-        with st.form("agent_case_form"):
-            amount = st.number_input(
-                "Montant de la demande ou transaction",
-                min_value=0.0,
-                value=128.0,
-                step=10.0,
-                help="Montant financier associe au dossier a controler.",
-            )
-            hour = st.slider(
-                "Heure de depot",
-                min_value=0,
-                max_value=23,
-                value=14,
-                help="Heure de reception ou d'enregistrement du dossier.",
-            )
-            scenario = st.selectbox(
-                "Profil de dossier",
-                ["Standard", "Montant atypique", "Signaux incoherents", "Cas fortement suspect"],
-                help="Scenario de demonstration qui modifie les variables anonymisees V1 a V28.",
-            )
-            st.form_submit_button("Calculer le score de risque")
+        with st.container(border=True):
+            st.markdown("#### Saisie agent")
+            with st.form("agent_case_form"):
+                amount = st.number_input(
+                    "Montant de la demande ou transaction",
+                    min_value=0.0,
+                    value=128.0,
+                    step=10.0,
+                    help="Montant financier associe au dossier a controler.",
+                )
+                hour = st.slider(
+                    "Heure de depot",
+                    min_value=0,
+                    max_value=23,
+                    value=14,
+                    help="Heure de reception ou d'enregistrement du dossier.",
+                )
+                scenario = st.selectbox(
+                    "Profil de dossier",
+                    ["Standard", "Montant atypique", "Signaux incoherents", "Cas fortement suspect"],
+                    help="Scenario de demonstration qui applique un profil PCA coherent avec le modele.",
+                )
+                st.form_submit_button("Calculer le score de risque")
 
-        st.markdown(
-            """
-            <div class="form-note">
-                Les variables V1 a V28 sont des composantes anonymisees issues du dataset de reference.
-                En production, elles correspondraient a des signaux metier pseudonymises et documentes.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown(
+                """
+                <div class="form-note">
+                    Les variables V1 a V28 sont des composantes anonymisees issues du dataset de reference.
+                    En production, elles correspondraient a des signaux metier pseudonymises et documentes.
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     case = make_case(amount, hour, scenario)
     score = float(predict_proba_positive(model, case)[0])
@@ -657,36 +766,34 @@ if page == "Scoring agent":
     color = risk_color(score)
 
     with right:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("#### Score de risque")
-        st.markdown(
-            f"""
-            <div style="display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;">
-                <div class="risk-score">{score * 100:.0f}<span>/100</span></div>
-                <div class="risk-badge" style="background:{color};">Risque {label}</div>
-            </div>
-            <div class="gauge-shell">
-                <div class="gauge-fill" style="width:{min(max(score, 0), 1) * 100:.1f}%"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;color:#6B7280;font-size:0.78rem;font-weight:750;">
-                <span>Faible</span><span>Modere</span><span>Eleve</span>
-            </div>
-            <div class="action-box">
-                <div class="action-title">Action recommandee</div>
-                <div class="action-text">{action}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### Score de risque")
+            st.markdown(
+                f"""
+                <div style="display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;">
+                    <div class="risk-score">{score * 100:.0f}<span>/100</span></div>
+                    <div class="risk-badge" style="background:{color};">Risque {label}</div>
+                </div>
+                <div class="gauge-shell">
+                    <div class="gauge-fill" style="width:{min(max(score, 0), 1) * 100:.1f}%"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;color:#6B7280;font-size:0.78rem;font-weight:750;">
+                    <span>Faible</span><span>Modere</span><span>Eleve</span>
+                </div>
+                <div class="action-box">
+                    <div class="action-title">Action recommandee</div>
+                    <div class="action-text">{action}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     lower_left, lower_right = st.columns([0.52, 0.48], gap="large")
     with lower_left:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("#### Explicabilite")
-        st.caption("Importance indicative des signaux pour le dossier courant. Ces elements orientent l'analyse agent.")
-        render_explainability(model_importance(model, columns, case))
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### Explicabilite")
+            st.caption("Importance indicative des signaux pour le dossier courant. Ces elements orientent l'analyse agent.")
+            render_explainability(model_importance(model, columns, case))
 
     with lower_right:
         st.markdown(
@@ -709,29 +816,27 @@ elif page == "Modele ML":
     st.markdown('<div class="section-title">Performance du modele</div>', unsafe_allow_html=True)
     col_a, col_b = st.columns([0.48, 0.52], gap="large")
     with col_a:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("#### Modele selectionne")
-        st.write(f"**{report.name}**")
-        st.write(
-            "Le seuil operationnel est calibre pour conserver un taux de faux positifs faible, "
-            "tout en maintenant une capacite de detection utile pour les agents."
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### Modele selectionne")
+            st.write(f"**{report.name}**")
+            st.write(
+                "Le seuil operationnel est calibre pour conserver un taux de faux positifs faible, "
+                "tout en maintenant une capacite de detection utile pour les agents."
+            )
     with col_b:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("#### Metriques")
-        metrics = pd.DataFrame(
-            [
-                {"KPI": "AUC-PR", "Valeur": report.average_precision},
-                {"KPI": "ROC-AUC", "Valeur": report.roc_auc},
-                {"KPI": "Precision", "Valeur": report.precision},
-                {"KPI": "Recall", "Valeur": report.recall},
-                {"KPI": "F1-score", "Valeur": report.f1},
-                {"KPI": "False positive rate", "Valeur": report.false_positive_rate},
-            ]
-        )
-        st.dataframe(metrics, hide_index=True, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### Metriques")
+            metrics = pd.DataFrame(
+                [
+                    {"KPI": "AUC-PR", "Valeur": report.average_precision},
+                    {"KPI": "ROC-AUC", "Valeur": report.roc_auc},
+                    {"KPI": "Precision", "Valeur": report.precision},
+                    {"KPI": "Recall", "Valeur": report.recall},
+                    {"KPI": "F1-score", "Valeur": report.f1},
+                    {"KPI": "False positive rate", "Valeur": report.false_positive_rate},
+                ]
+            )
+            st.dataframe(metrics, hide_index=True, use_container_width=True)
 
 elif page == "Gouvernance":
     st.markdown('<div class="section-title">Gouvernance IA responsable</div>', unsafe_allow_html=True)
@@ -762,10 +867,9 @@ elif page == "Gouvernance":
                 unsafe_allow_html=True,
             )
 
-    st.markdown('<div class="card" style="margin-top:18px;">', unsafe_allow_html=True)
-    st.markdown("#### Cadre RGPD et AI Act")
-    st.write(
-        "Le systeme doit etre documente comme une IA a haut risque: base legale, minimisation des donnees, "
-        "duree de conservation, droit de recours, explicabilite et revue humaine des dossiers sensibles."
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("#### Cadre RGPD et AI Act")
+        st.write(
+            "Le systeme doit etre documente comme une IA a haut risque: base legale, minimisation des donnees, "
+            "duree de conservation, droit de recours, explicabilite et revue humaine des dossiers sensibles."
+        )
