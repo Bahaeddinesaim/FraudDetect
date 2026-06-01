@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Local data cache. The Kaggle dataset is downloaded with download_data.py.
+data/*.csv
+data/*.zip
+
+# Local IDE and OS files.
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Streamlit local secrets must never be committed.
+.streamlit/secrets.toml
