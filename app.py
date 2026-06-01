@@ -63,12 +63,24 @@ def configure_page() -> None:
         }}
 
         [data-testid="stSidebar"] {{
-            background: linear-gradient(180deg, #0B1220 0%, #111827 100%);
-            border-right: 1px solid rgba(255,255,255,.08);
+            background: #FFFFFF;
+            border-right: 1px solid #E5E7EB;
+            box-shadow: 12px 0 28px rgba(15, 23, 42, .04);
         }}
 
         [data-testid="stSidebar"] * {{
-            color: #F9FAFB;
+            color: #111827;
+        }}
+
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span {{
+            color: #111827 !important;
+        }}
+
+        [data-testid="stSidebar"] [data-baseweb="select"] span,
+        [data-testid="stSidebar"] [data-baseweb="tag"] span {{
+            color: #111827 !important;
         }}
 
         .block-container {{
@@ -146,21 +158,21 @@ def configure_page() -> None:
         }}
 
         .brand-subtitle {{
-            color: #CBD5E1;
+            color: #64748B;
             font-size: .78rem;
             margin-top: 3px;
         }}
 
         .side-card {{
-            border: 1px solid rgba(255,255,255,.10);
-            background: rgba(255,255,255,.055);
+            border: 1px solid #E5E7EB;
+            background: #F8FAFC;
             border-radius: 16px;
             padding: 14px;
             margin: 14px 0;
         }}
 
         .side-k {{
-            color: #94A3B8;
+            color: #64748B;
             font-size: .72rem;
             text-transform: uppercase;
             font-weight: 800;
@@ -168,7 +180,7 @@ def configure_page() -> None:
         }}
 
         .side-v {{
-            color: white;
+            color: #111827;
             font-size: .96rem;
             font-weight: 850;
             margin-bottom: 12px;
