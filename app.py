@@ -43,6 +43,20 @@ class GeminiResult:
 
 def configure_page() -> None:
     st.set_page_config(page_title=APP_TITLE, layout="wide")
+    dark_mode = bool(st.session_state.get("dark_mode", False))
+    theme = {
+        "bg": "#0F172A" if dark_mode else COLORS["bg"],
+        "card": "#111827" if dark_mode else "#FFFFFF",
+        "surface": "#1F2937" if dark_mode else "#F8FAFC",
+        "border": "#334155" if dark_mode else "#E5E7EB",
+        "text": "#F9FAFB" if dark_mode else "#111827",
+        "muted": "#CBD5E1" if dark_mode else "#64748B",
+        "sidebar_bg": "#111827" if dark_mode else "#FFFFFF",
+        "sidebar_text": "#F9FAFB" if dark_mode else "#111827",
+        "sidebar_card": "#1F2937" if dark_mode else "#F8FAFC",
+        "shadow": "0 16px 38px rgba(0, 0, 0, .22)" if dark_mode else "0 12px 30px rgba(15, 23, 42, .055)",
+        "sidebar_shadow": "12px 0 28px rgba(0, 0, 0, .22)" if dark_mode else "12px 0 28px rgba(15, 23, 42, .04)",
+    }
     st.markdown(
         f"""
         <style>
@@ -50,11 +64,13 @@ def configure_page() -> None:
             --night: {COLORS["night"]};
             --green: {COLORS["green"]};
             --red: {COLORS["red"]};
-            --bg: {COLORS["bg"]};
-            --card: {COLORS["card"]};
-            --border: {COLORS["border"]};
-            --text: {COLORS["text"]};
-            --muted: {COLORS["muted"]};
+            --bg: {theme["bg"]};
+            --card: {theme["card"]};
+            --surface: {theme["surface"]};
+            --border: {theme["border"]};
+            --text: {theme["text"]};
+            --muted: {theme["muted"]};
+            --shadow: {theme["shadow"]};
         }}
 
         .stApp {{
@@ -63,19 +79,19 @@ def configure_page() -> None:
         }}
 
         [data-testid="stSidebar"] {{
-            background: #FFFFFF;
-            border-right: 1px solid #E5E7EB;
-            box-shadow: 12px 0 28px rgba(15, 23, 42, .04);
+            background: {theme["sidebar_bg"]};
+            border-right: 1px solid var(--border);
+            box-shadow: {theme["sidebar_shadow"]};
         }}
 
         [data-testid="stSidebar"] * {{
-            color: #111827;
+            color: {theme["sidebar_text"]};
         }}
 
         [data-testid="stSidebar"] label,
         [data-testid="stSidebar"] p,
         [data-testid="stSidebar"] span {{
-            color: #111827 !important;
+            color: {theme["sidebar_text"]} !important;
         }}
 
         [data-testid="stSidebar"] [data-baseweb="select"] span,
@@ -160,21 +176,21 @@ def configure_page() -> None:
         }}
 
         .brand-subtitle {{
-            color: #64748B;
+            color: var(--muted);
             font-size: .78rem;
             margin-top: 3px;
         }}
 
         .side-card {{
-            border: 1px solid #E5E7EB;
-            background: #F8FAFC;
+            border: 1px solid var(--border);
+            background: {theme["sidebar_card"]};
             border-radius: 16px;
             padding: 14px;
             margin: 14px 0;
         }}
 
         .side-k {{
-            color: #64748B;
+            color: var(--muted);
             font-size: .72rem;
             text-transform: uppercase;
             font-weight: 800;
@@ -182,19 +198,19 @@ def configure_page() -> None:
         }}
 
         .side-v {{
-            color: #111827;
+            color: {theme["sidebar_text"]};
             font-size: .96rem;
             font-weight: 850;
             margin-bottom: 12px;
         }}
 
         .kpi-card {{
-            background: white;
+            background: var(--card);
             border: 1px solid var(--border);
             border-radius: 18px;
             padding: 18px;
             min-height: 128px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, .055);
+            box-shadow: var(--shadow);
         }}
 
         .kpi-label {{
@@ -219,11 +235,11 @@ def configure_page() -> None:
         }}
 
         .panel {{
-            background: white;
+            background: var(--card);
             border: 1px solid var(--border);
             border-radius: 18px;
             padding: 18px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, .05);
+            box-shadow: var(--shadow);
             height: 100%;
         }}
 
@@ -234,8 +250,8 @@ def configure_page() -> None:
         }}
 
         .ai-box {{
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-left: 5px solid #10B981;
             border-radius: 16px;
             padding: 15px 16px;
@@ -243,7 +259,7 @@ def configure_page() -> None:
         }}
 
         .ai-title {{
-            color: #334155;
+            color: var(--muted);
             text-transform: uppercase;
             font-weight: 900;
             font-size: .75rem;
@@ -251,7 +267,7 @@ def configure_page() -> None:
         }}
 
         .ai-text {{
-            color: #0F172A;
+            color: var(--text);
             line-height: 1.55;
             font-weight: 650;
         }}
@@ -265,17 +281,17 @@ def configure_page() -> None:
         }}
 
         .score-card {{
-            background: #FFFFFF;
-            border: 1px solid #E5E7EB;
+            background: var(--card);
+            border: 1px solid var(--border);
             border-radius: 18px;
             padding: 18px 20px;
             min-height: 122px;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, .055);
+            box-shadow: var(--shadow);
             overflow-wrap: anywhere;
         }}
 
         .score-label {{
-            color: #64748B;
+            color: var(--muted);
             font-size: .78rem;
             text-transform: uppercase;
             font-weight: 900;
@@ -283,7 +299,7 @@ def configure_page() -> None:
         }}
 
         .score-value {{
-            color: #0F172A;
+            color: var(--text);
             font-size: clamp(1.02rem, 1.55vw, 1.35rem);
             line-height: 1.15;
             font-weight: 900;
@@ -298,11 +314,11 @@ def configure_page() -> None:
         }}
 
         .detail-card {{
-            background: #FFFFFF;
-            border: 1px solid #E5E7EB;
+            background: var(--card);
+            border: 1px solid var(--border);
             border-radius: 18px;
             padding: 20px;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, .055);
+            box-shadow: var(--shadow);
             min-height: 240px;
         }}
 
@@ -316,8 +332,8 @@ def configure_page() -> None:
             justify-content: space-between;
             align-items: center;
             gap: 14px;
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 14px;
             padding: 12px 14px;
             margin: 14px 0;
@@ -350,16 +366,27 @@ def configure_page() -> None:
         }}
 
         div[data-testid="stMetric"] {{
-            background: white;
+            background: var(--card);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 14px;
         }}
 
         .small-muted {{
-            color: #64748B;
+            color: var(--muted);
             font-size: .88rem;
             line-height: 1.55;
+        }}
+
+        div[data-testid="stVerticalBlockBorderWrapper"] {{
+            background: var(--card);
+            border-color: var(--border);
+        }}
+
+        div[data-testid="stDataFrame"],
+        div[data-testid="stJson"] {{
+            background: var(--card);
+            border-radius: 14px;
         }}
 
         @media(max-width: 900px) {{
@@ -462,14 +489,19 @@ def kpi_card(label: str, value: str, note: str) -> None:
 
 
 def chart_layout(fig: go.Figure, height: int = 340) -> go.Figure:
+    dark_mode = bool(st.session_state.get("dark_mode", False))
+    text_color = "#F9FAFB" if dark_mode else COLORS["text"]
+    grid_color = "#334155" if dark_mode else "#E5E7EB"
     fig.update_layout(
         height=height,
         margin=dict(l=10, r=10, t=45, b=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color=COLORS["text"], family="Inter, Arial, sans-serif"),
+        font=dict(color=text_color, family="Inter, Arial, sans-serif"),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
+    fig.update_xaxes(gridcolor=grid_color, zerolinecolor=grid_color)
+    fig.update_yaxes(gridcolor=grid_color, zerolinecolor=grid_color)
     return fig
 
 
@@ -952,6 +984,9 @@ def sidebar_controls(df: pd.DataFrame) -> tuple[str, str, list[str], list[str], 
             """,
             unsafe_allow_html=True,
         )
+        st.toggle("Mode sombre", key="dark_mode")
+        st.caption("Change le theme visuel de toute l'interface.")
+        st.divider()
         page = st.radio(
             "Navigation",
             ["Dashboard executif", "Analyse Gemini", "Cadrage IA", "Deploiement"],
