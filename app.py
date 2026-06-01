@@ -5,6 +5,7 @@ import os
 import re
 from dataclasses import dataclass
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -14,7 +15,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 
-APP_TITLE = "NovaTrust Bank - ClientCare AI"
+APP_TITLE = "FraudDetect-ai"
 GEMINI_MODEL = "gemini-1.5-flash"
 
 COLORS = {
@@ -41,7 +42,7 @@ class GeminiResult:
 
 
 def configure_page() -> None:
-    st.set_page_config(page_title=APP_TITLE, page_icon="NB", layout="wide")
+    st.set_page_config(page_title=APP_TITLE, layout="wide")
     st.markdown(
         f"""
         <style>
@@ -447,7 +448,7 @@ def fallback_analysis(message: str, client_segment: str, channel: str, priority_
 
 def build_gemini_prompt(message: str, client_segment: str, channel: str, priority_hint: str) -> str:
     return f"""
-Tu es un agent IA bancaire pour NovaTrust Bank. Analyse le message client ci-dessous.
+Tu es un agent IA bancaire pour FraudDetect-ai. Analyse le message client ci-dessous.
 Retourne uniquement un JSON valide, sans markdown, avec exactement les cles suivantes:
 resume_operationnel, intention_client, sentiment_client, niveau_urgence, score_risque,
 categorie_reclamation, reponse_proposee, actions_recommandees, justification_decision,
@@ -545,7 +546,7 @@ def dashboard_page(df: pd.DataFrame) -> None:
         """
         <div class="hero">
             <div class="badge">Executive Dashboard</div>
-            <h1>NovaTrust ClientCare AI</h1>
+            <h1>FraudDetect-ai</h1>
             <p>Vue executive des reclamations clients, risques SLA, exposition financiere et priorisation operationnelle.</p>
         </div>
         """,
@@ -772,7 +773,7 @@ def deployment_page() -> None:
     st.markdown("### Architecture technique")
     st.code(
         """
-Client message -> Streamlit UI -> Gemini ClientCare Agent
+Client message -> Streamlit UI -> Gemini FraudDetect-ai Agent
                 -> Structured JSON -> Agent dashboard
                 -> Human validation -> CRM / ticketing system
 
@@ -821,11 +822,17 @@ def sidebar_controls(df: pd.DataFrame) -> tuple[str, str, list[str], list[str], 
     with st.sidebar:
         st.markdown(
             """
+            """,
+            unsafe_allow_html=True,
+        )
+        if Path("logo.png").exists():
+            st.image("logo.png", use_container_width=True)
+        st.markdown(
+            """
             <div class="brand">
-                <div class="brand-mark">NT</div>
                 <div>
-                    <div class="brand-title">NovaTrust Bank</div>
-                    <div class="brand-subtitle">ClientCare AI</div>
+                    <div class="brand-title">FraudDetect-ai</div>
+                    <div class="brand-subtitle">Fraud Risk Intelligence</div>
                 </div>
             </div>
             """,
