@@ -16,7 +16,7 @@ import streamlit as st
 
 
 APP_TITLE = "FraudDetect-ai"
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 COLORS = {
     "night": "#0B1220",
