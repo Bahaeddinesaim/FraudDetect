@@ -84,8 +84,10 @@ def configure_page() -> None:
         }}
 
         .block-container {{
-            max-width: 1400px;
+            max-width: none;
             padding-top: 1.6rem;
+            padding-left: 1.4rem;
+            padding-right: 1.4rem;
             padding-bottom: 3rem;
         }}
 
@@ -254,6 +256,74 @@ def configure_page() -> None:
             font-weight: 650;
         }}
 
+        .score-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin: 18px 0;
+            width: 100%;
+        }}
+
+        .score-card {{
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 18px;
+            padding: 18px 20px;
+            min-height: 122px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, .055);
+            overflow-wrap: anywhere;
+        }}
+
+        .score-label {{
+            color: #64748B;
+            font-size: .78rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }}
+
+        .score-value {{
+            color: #0F172A;
+            font-size: clamp(1.25rem, 2.3vw, 2.05rem);
+            line-height: 1.15;
+            font-weight: 900;
+        }}
+
+        .detail-grid {{
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+            margin-top: 12px;
+            width: 100%;
+        }}
+
+        .detail-card {{
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, .055);
+            min-height: 240px;
+        }}
+
+        .detail-card h3 {{
+            margin-top: 0;
+            font-size: 1.16rem;
+        }}
+
+        .confidence-line {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin: 14px 0;
+            font-weight: 850;
+        }}
+
         .risk-pill {{
             display: inline-flex;
             border-radius: 999px;
@@ -298,6 +368,10 @@ def configure_page() -> None:
             }}
             .kpi-card {{
                 min-height: auto;
+            }}
+            .score-grid,
+            .detail-grid {{
+                grid-template-columns: 1fr;
             }}
         }}
         </style>
@@ -534,23 +608,49 @@ def render_ai_summary(result: dict[str, Any]) -> None:
         unsafe_allow_html=True,
     )
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Intention", result.get("intention_client", "-"))
-    col2.metric("Sentiment", result.get("sentiment_client", "-"))
-    col3.metric("Urgence", result.get("niveau_urgence", "-"))
-    col4.metric("Escalade", "Oui" if result.get("escalade_necessaire") else "Non")
 
-    action_col, why_col = st.columns([0.52, 0.48], gap="large")
-    with action_col:
-        st.markdown("#### Actions recommandees")
-        for action in result.get("actions_recommandees", []):
-            st.markdown(f"- {action}")
-    with why_col:
-        st.markdown("#### Justification")
-        st.write(result.get("justification_decision", "-"))
-        st.metric("Niveau de confiance", f"{float(result.get('niveau_confiance', 0)):.0%}")
-        st.markdown("#### Resume superviseur")
-        st.write(result.get("resume_superviseur", "-"))
+def render_ai_details(result: dict[str, Any]) -> None:
+    actions = "".join(f"<li>{action}</li>" for action in result.get("actions_recommandees", []))
+    confidence = float(result.get("niveau_confiance", 0))
+    st.markdown(
+        f"""
+        <div class="score-grid">
+            <div class="score-card">
+                <div class="score-label">Intention</div>
+                <div class="score-value">{result.get("intention_client", "-")}</div>
+            </div>
+            <div class="score-card">
+                <div class="score-label">Sentiment</div>
+                <div class="score-value">{result.get("sentiment_client", "-")}</div>
+            </div>
+            <div class="score-card">
+                <div class="score-label">Urgence</div>
+                <div class="score-value">{result.get("niveau_urgence", "-")}</div>
+            </div>
+            <div class="score-card">
+                <div class="score-label">Escalade</div>
+                <div class="score-value">{"Oui" if result.get("escalade_necessaire") else "Non"}</div>
+            </div>
+        </div>
+        <div class="detail-grid">
+            <div class="detail-card">
+                <h3>Actions recommandees</h3>
+                <ul>{actions}</ul>
+            </div>
+            <div class="detail-card">
+                <h3>Justification</h3>
+                <p class="small-muted">{result.get("justification_decision", "-")}</p>
+                <div class="confidence-line">
+                    <span>Niveau de confiance</span>
+                    <span>{confidence:.0%}</span>
+                </div>
+                <h3>Resume superviseur</h3>
+                <p class="small-muted">{result.get("resume_superviseur", "-")}</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def dashboard_page(df: pd.DataFrame) -> None:
@@ -732,6 +832,8 @@ def analysis_page(api_key: str) -> None:
             st.warning(f"Gemini indisponible, fallback simule utilise. Detail: {result.error}")
         st.caption(f"Fournisseur: {result.provider}")
         render_ai_summary(result.data)
+
+    render_ai_details(result.data)
 
     st.markdown("### Sortie JSON structuree")
     st.json(result.data)
