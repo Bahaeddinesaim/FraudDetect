@@ -284,7 +284,7 @@ def configure_page() -> None:
 
         .score-value {{
             color: #0F172A;
-            font-size: clamp(1.25rem, 2.3vw, 2.05rem);
+            font-size: clamp(1.02rem, 1.55vw, 1.35rem);
             line-height: 1.15;
             font-weight: 900;
         }}
