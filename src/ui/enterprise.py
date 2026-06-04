@@ -11,6 +11,24 @@ import streamlit as st
 from src.config import PALETTE, RISK_COLORS, RISK_LEVELS
 
 
+NAV_ICONS = {
+    "Accueil": "⌂",
+    "Dashboard executif": "▦",
+    "Centre d'alertes": "◉",
+    "Analyse IA": "✦",
+    "Investigation": "⌕",
+    "Portefeuille dossiers": "▣",
+    "Monitoring modeles": "▤",
+    "Prevision": "⌁",
+    "Carte fraude": "⌖",
+    "Rapports": "◫",
+    "Journal d'audit": "▥",
+    "IA Responsable": "♙",
+    "Administration": "⚙",
+    "Parametres": "◌",
+}
+
+
 def inject_enterprise_theme(mode: str) -> None:
     dark = mode == "Dark"
     bg = "#0F172A" if dark else PALETTE["background"]
@@ -32,6 +50,76 @@ def inject_enterprise_theme(mode: str) -> None:
         h1,h2,h3,h4,p,span,label {{ letter-spacing: 0; }}
         [data-testid="stSidebar"] {{ background:{sidebar}; border-right:1px solid var(--fd-border); }}
         [data-testid="stSidebar"] * {{ letter-spacing:0; }}
+        [data-testid="stSidebarContent"] {{
+            padding: .35rem .78rem 1rem .78rem;
+        }}
+        [data-testid="stSidebar"] .stImage {{
+            margin: 0 0 .48rem 0;
+            padding: 0;
+        }}
+        [data-testid="stSidebar"] .stImage img {{
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+            border-radius: 0;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] {{
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 0;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label {{
+            position: relative;
+            width: 100%;
+            min-height: 42px;
+            padding: 0 12px !important;
+            border-radius: 14px;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: background .18s ease, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label:hover {{
+            background: {"rgba(255,255,255,.08)" if dark else "#F1F5F9"};
+            transform: translateX(2px);
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {{
+            background: linear-gradient(135deg, #3A86FF 0%, #4361EE 100%);
+            box-shadow: 0 12px 24px rgba(58, 134, 255, .26);
+            border-color: rgba(255,255,255,.16);
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label > div:first-child {{
+            display: none;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label div[data-testid="stMarkdownContainer"] p {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin: 0;
+            color: {"#D5DEEA" if dark else "#334155"};
+            font-size: .91rem;
+            font-weight: 740;
+            line-height: 42px;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label div[data-testid="stMarkdownContainer"] p::after {{
+            content: "›";
+            color: {"#94A3B8" if dark else "#64748B"};
+            font-size: 1.25rem;
+            line-height: 1;
+            transition: color .18s ease, transform .18s ease;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label:hover div[data-testid="stMarkdownContainer"] p::after {{
+            color: var(--fd-accent);
+            transform: translateX(2px);
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p,
+        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p::after {{
+            color: #FFFFFF !important;
+        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked):hover {{
+            transform: translateX(0);
+        }}
         .hero {{
             position: relative; overflow:hidden; border:1px solid rgba(255,255,255,.16);
             background: linear-gradient(135deg, rgba(11,19,43,.96), rgba(28,37,65,.93)), radial-gradient(circle at top right, rgba(58,134,255,.35), transparent 34%);
@@ -136,72 +224,26 @@ def apply_chart_theme(fig: go.Figure, height: int = 360) -> go.Figure:
 
 def render_sidebar(cases: pd.DataFrame, navigation: list[str], gemini_model: str, default_api_key: str) -> dict[str, Any]:
     with st.sidebar:
-        if st.session_state.get("theme_mode") == "Dark":
-            logo_bg = "#3A86FF"
-        else:
-            logo_bg = "#0B132B"
         if Path("logo.png").exists():
-            st.markdown(
-                """
-                <div class="side-card" style="padding:10px;">
-                """,
-                unsafe_allow_html=True,
-            )
             st.image("logo.png", use_container_width=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown(
-            f"""
-            <div class="side-card">
-                <div style="display:flex;gap:12px;align-items:center;">
-                    <div style="width:42px;height:42px;border-radius:8px;background:{logo_bg};color:white;display:grid;place-items:center;font-weight:950;">FD</div>
-                    <div>
-                        <div class="side-title">FraudDetect AI</div>
-                        <div class="muted" style="font-size:.78rem;">Fraud Risk Intelligence</div>
-                    </div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        labels = {f"{NAV_ICONS.get(item, '•')}  {item}": item for item in navigation}
+        current = st.session_state.get("active_page", navigation[0])
+        current_label = next((label for label, value in labels.items() if value == current), next(iter(labels)))
+        page_label = st.radio(
+            "Navigation",
+            list(labels),
+            index=list(labels).index(current_label),
+            label_visibility="collapsed",
         )
-        page = st.radio("Navigation", navigation, label_visibility="collapsed")
-        st.divider()
-        theme_index = 1 if st.session_state.get("theme_mode") == "Dark" else 0
-        st.session_state.theme_mode = st.radio("Theme", ["Light", "Dark"], index=theme_index, horizontal=True)
-        api_key = st.text_input("Cle Gemini API", value=default_api_key, type="password")
-        st.markdown(
-            f"""
-            <div class="side-card">
-                <div class="side-k">Statut Gemini</div>
-                <div class="side-v">{'Connecte' if api_key else 'Fallback local'}</div>
-                <div class="side-k">Modele IA</div>
-                <div class="side-v">{gemini_model}</div>
-                <div class="side-k">Modele ML</div>
-                <div class="side-v">Random Forest actif</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.divider()
-        st.caption("Filtres globaux")
-        regions = st.multiselect("Regions", sorted(cases["region"].unique()), default=sorted(cases["region"].unique()))
-        risk_levels = st.multiselect("Niveaux", RISK_LEVELS, default=RISK_LEVELS)
-        statuses = st.multiselect("Statuts", sorted(cases["status"].unique()), default=sorted(cases["status"].unique()))
+        page = labels[page_label]
+        st.session_state.active_page = page
+        api_key = default_api_key
+        regions = sorted(cases["region"].unique())
+        risk_levels = RISK_LEVELS
+        statuses = sorted(cases["status"].unique())
         min_date = cases["submitted_at"].dt.date.min()
         max_date = cases["submitted_at"].dt.date.max()
-        date_range = st.date_input("Periode", value=(min_date, max_date), min_value=min_date, max_value=max_date)
-        if isinstance(date_range, date):
-            date_range = (date_range, date_range)
-        st.markdown(
-            f"""
-            <div class="side-card">
-                <div class="side-k">Session</div>
-                <div class="side-v">Analyste fraude</div>
-                <div class="side-k">Dossiers visibles</div>
-                <div class="side-v">{len(cases):,}</div>
-            </div>
-            """.replace(",", " "),
-            unsafe_allow_html=True,
-        )
+        date_range = (min_date, max_date)
         return {
             "page": page,
             "api_key": api_key,
