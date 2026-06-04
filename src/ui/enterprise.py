@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -139,6 +140,15 @@ def render_sidebar(cases: pd.DataFrame, navigation: list[str], gemini_model: str
             logo_bg = "#3A86FF"
         else:
             logo_bg = "#0B132B"
+        if Path("logo.png").exists():
+            st.markdown(
+                """
+                <div class="side-card" style="padding:10px;">
+                """,
+                unsafe_allow_html=True,
+            )
+            st.image("logo.png", use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         st.markdown(
             f"""
             <div class="side-card">
