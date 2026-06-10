@@ -356,19 +356,18 @@ def team_page() -> None:
             "linkedin": "https://www.linkedin.com/in/hazem-ouni/",
         },
     ]
-    cards = []
-    for member in members:
-        cards.append(
-            f"""
-            <div class="team-card">
-                <div class="team-avatar">{member['initials']}</div>
-                <div class="team-name">{member['name']}</div>
-                <div class="team-role">{member['role']}</div>
-                <a class="team-link" href="{member['linkedin']}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </div>
-            """
+    cards = "".join(
+        (
+            '<div class="team-card">'
+            f'<div class="team-avatar">{member["initials"]}</div>'
+            f'<div class="team-name">{member["name"]}</div>'
+            f'<div class="team-role">{member["role"]}</div>'
+            f'<a class="team-link" href="{member["linkedin"]}" target="_blank" rel="noopener noreferrer">LinkedIn</a>'
+            "</div>"
         )
-    st.markdown(f"<div class=\"team-grid\">{''.join(cards)}</div>", unsafe_allow_html=True)
+        for member in members
+    )
+    st.markdown(f'<div class="team-grid">{cards}</div>', unsafe_allow_html=True)
 
 
 def admin_page(cases: pd.DataFrame) -> None:
