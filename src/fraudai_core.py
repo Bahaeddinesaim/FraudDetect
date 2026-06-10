@@ -40,7 +40,7 @@ class ModelReport:
     false_positive_rate: float
 
 
-def load_transactions(path: str | Path = "data/creditcard.csv") -> pd.DataFrame:
+def load_transactions(path: str | Path = "data/creditcard.csv", strict: bool = False) -> pd.DataFrame:
     path = Path(path)
     if path.exists():
         df = pd.read_csv(path)
@@ -48,6 +48,11 @@ def load_transactions(path: str | Path = "data/creditcard.csv") -> pd.DataFrame:
         if missing:
             raise ValueError(f"Colonnes manquantes dans {path}: {missing}")
         return df[FEATURES + [TARGET]].copy()
+    if strict:
+        raise FileNotFoundError(
+            f"Base de donnees obligatoire introuvable: {path}. "
+            "Place le fichier creditcard.csv fourni dans le dossier data/."
+        )
     return make_synthetic_transactions()
 
 
@@ -106,9 +111,11 @@ def candidate_models() -> dict[str, Any]:
             ]
         ),
         "Random Forest": RandomForestClassifier(
-            n_estimators=160,
-            min_samples_leaf=2,
+            n_estimators=360,
+            max_features="sqrt",
+            min_samples_leaf=1,
             class_weight="balanced_subsample",
+            oob_score=True,
             n_jobs=-1,
             random_state=RANDOM_STATE,
         ),

@@ -6,7 +6,7 @@ from src.fraudai_core import load_transactions, save_bundle, split_xy, train_and
 
 
 def main() -> None:
-    df = load_transactions()
+    df = load_transactions("data/creditcard.csv", strict=True)
     model, best_report, reports, X_test, y_test = train_and_select(df)
     X, _ = split_xy(df)
     save_bundle("models/fraudai_model.joblib", model, best_report, list(X.columns))

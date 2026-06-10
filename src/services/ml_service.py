@@ -16,7 +16,10 @@ def load_random_forest_model():
         import joblib
 
         if Path(MODEL_PATH).exists():
-            return joblib.load(MODEL_PATH)
+            bundle = joblib.load(MODEL_PATH)
+            if isinstance(bundle, dict) and "model" in bundle:
+                return bundle
+            return {"model": bundle, "columns": None, "report": None}
     except Exception:
         return None
     return None
@@ -38,12 +41,13 @@ def load_model_metrics() -> pd.DataFrame:
 
 
 def random_forest_scores(cases: pd.DataFrame) -> np.ndarray:
-    model = load_random_forest_model()
+    bundle = load_random_forest_model()
     fallback = np.clip(cases["risk_score"].to_numpy(dtype=float) / 100, 0, 1)
-    if model is None:
+    if bundle is None:
         return fallback
+    model = bundle["model"]
     try:
-        features = getattr(model, "feature_names_in_", None)
+        features = bundle.get("columns") or getattr(model, "feature_names_in_", None)
         if features is not None and set(features).issubset(cases.columns):
             x = cases[list(features)]
         else:
