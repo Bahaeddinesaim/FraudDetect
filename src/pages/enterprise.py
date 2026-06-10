@@ -336,6 +336,41 @@ def responsible_ai_page(cases: pd.DataFrame) -> None:
     st.plotly_chart(apply_chart_theme(fig), use_container_width=True)
 
 
+def team_page() -> None:
+    render_hero(
+        "Team de dev",
+        "Equipe de developpement FraudDetect-AI, data science, IA et experience produit.",
+        ["Developpement", "Data & IA", "FraudDetect-AI"],
+    )
+    members = [
+        {
+            "name": "SAIM BAHAEDDINE",
+            "initials": "SB",
+            "role": "Developpeur / Data & IA",
+            "linkedin": "https://www.linkedin.com/in/bahaeddine-saim/",
+        },
+        {
+            "name": "Hazem OUNI",
+            "initials": "HO",
+            "role": "Developpeur / Data & IA",
+            "linkedin": "https://www.linkedin.com/in/hazem-ouni/",
+        },
+    ]
+    cards = []
+    for member in members:
+        cards.append(
+            f"""
+            <div class="team-card">
+                <div class="team-avatar">{member['initials']}</div>
+                <div class="team-name">{member['name']}</div>
+                <div class="team-role">{member['role']}</div>
+                <a class="team-link" href="{member['linkedin']}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </div>
+            """
+        )
+    st.markdown(f"<div class=\"team-grid\">{''.join(cards)}</div>", unsafe_allow_html=True)
+
+
 def admin_page(cases: pd.DataFrame) -> None:
     render_hero("Administration", "Etat systeme, session, modeles, donnees et controles operationnels.", ["Ops", "System", "Settings"])
     c1, c2, c3 = st.columns(3)
@@ -379,6 +414,8 @@ def render_page(page: str, cases: pd.DataFrame, all_cases: pd.DataFrame, gemini_
         audit_page()
     elif page == "IA Responsable":
         responsible_ai_page(cases)
+    elif page == "Team de dev":
+        team_page()
     elif page == "Administration":
         admin_page(cases)
     elif page == "Parametres":

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -12,20 +11,21 @@ from src.config import PALETTE, RISK_COLORS, RISK_LEVELS
 
 
 NAV_ICONS = {
-    "Accueil": "⌂",
-    "Dashboard executif": "▦",
-    "Centre d'alertes": "◉",
-    "Analyse IA": "✦",
-    "Investigation": "⌕",
-    "Portefeuille dossiers": "▣",
-    "Monitoring modeles": "▤",
-    "Prevision": "⌁",
-    "Carte fraude": "⌖",
-    "Rapports": "◫",
-    "Journal d'audit": "▥",
-    "IA Responsable": "♙",
-    "Administration": "⚙",
-    "Parametres": "◌",
+    "Accueil": "H",
+    "Dashboard executif": "D",
+    "Centre d'alertes": "A",
+    "Analyse IA": "AI",
+    "Investigation": "Q",
+    "Portefeuille dossiers": "P",
+    "Monitoring modeles": "M",
+    "Prevision": "F",
+    "Carte fraude": "G",
+    "Rapports": "R",
+    "Journal d'audit": "J",
+    "IA Responsable": "IR",
+    "Team de dev": "T",
+    "Administration": "AD",
+    "Parametres": "S",
 }
 
 
@@ -37,6 +37,9 @@ def inject_enterprise_theme(mode: str) -> None:
     muted = "#CBD5E1" if dark else PALETTE["muted"]
     border = "#334155" if dark else PALETTE["border"]
     sidebar = "#0B132B" if dark else "#FFFFFF"
+    sidebar_hover = "rgba(255,255,255,.08)" if dark else "#F1F5F9"
+    sidebar_text = "#D5DEEA" if dark else "#334155"
+    sidebar_arrow = "#94A3B8" if dark else "#64748B"
     st.markdown(
         f"""
         <style>
@@ -50,76 +53,44 @@ def inject_enterprise_theme(mode: str) -> None:
         h1,h2,h3,h4,p,span,label {{ letter-spacing: 0; }}
         [data-testid="stSidebar"] {{ background:{sidebar}; border-right:1px solid var(--fd-border); }}
         [data-testid="stSidebar"] * {{ letter-spacing:0; }}
-        [data-testid="stSidebarContent"] {{
-            padding: .35rem .78rem 1rem .78rem;
-        }}
-        [data-testid="stSidebar"] .stImage {{
-            margin: 0 0 .48rem 0;
-            padding: 0;
-        }}
+        [data-testid="stSidebarContent"] {{ padding: .35rem .78rem 1rem .78rem; }}
+        [data-testid="stSidebar"] .stImage {{ margin: 0 0 .48rem 0; padding: 0; }}
         [data-testid="stSidebar"] .stImage img {{
-            display: block;
-            max-width: 100%;
-            margin: 0 auto;
-            border-radius: 0;
+            display: block; max-width: 100%; margin: 0 auto; border-radius: 0;
         }}
         [data-testid="stSidebar"] [role="radiogroup"] {{
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 0;
+            display: flex; flex-direction: column; gap: 6px; margin-top: 0;
         }}
         [data-testid="stSidebar"] [role="radiogroup"] label {{
-            position: relative;
-            width: 100%;
-            min-height: 42px;
-            padding: 0 12px !important;
-            border-radius: 14px;
-            background: transparent;
-            border: 1px solid transparent;
+            position: relative; width: 100%; min-height: 42px; padding: 0 12px !important;
+            border-radius: 14px; background: transparent; border: 1px solid transparent;
             transition: background .18s ease, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         }}
         [data-testid="stSidebar"] [role="radiogroup"] label:hover {{
-            background: {"rgba(255,255,255,.08)" if dark else "#F1F5F9"};
-            transform: translateX(2px);
+            background: {sidebar_hover}; transform: translateX(2px);
         }}
         [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {{
             background: linear-gradient(135deg, #3A86FF 0%, #4361EE 100%);
             box-shadow: 0 12px 24px rgba(58, 134, 255, .26);
             border-color: rgba(255,255,255,.16);
         }}
-        [data-testid="stSidebar"] [role="radiogroup"] label > div:first-child {{
-            display: none;
-        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label > div:first-child {{ display: none; }}
         [data-testid="stSidebar"] [role="radiogroup"] label div[data-testid="stMarkdownContainer"] p {{
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            margin: 0;
-            color: {"#D5DEEA" if dark else "#334155"};
-            font-size: .91rem;
-            font-weight: 740;
-            line-height: 42px;
+            display: flex; align-items: center; justify-content: space-between; width: 100%;
+            margin: 0; color: {sidebar_text}; font-size: .91rem; font-weight: 740; line-height: 42px;
         }}
         [data-testid="stSidebar"] [role="radiogroup"] label div[data-testid="stMarkdownContainer"] p::after {{
-            content: "›";
-            color: {"#94A3B8" if dark else "#64748B"};
-            font-size: 1.25rem;
-            line-height: 1;
+            content: ">"; color: {sidebar_arrow}; font-size: 1rem; line-height: 1;
             transition: color .18s ease, transform .18s ease;
         }}
         [data-testid="stSidebar"] [role="radiogroup"] label:hover div[data-testid="stMarkdownContainer"] p::after {{
-            color: var(--fd-accent);
-            transform: translateX(2px);
+            color: var(--fd-accent); transform: translateX(2px);
         }}
         [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p,
         [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p::after {{
             color: #FFFFFF !important;
         }}
-        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked):hover {{
-            transform: translateX(0);
-        }}
+        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked):hover {{ transform: translateX(0); }}
         .hero {{
             position: relative; overflow:hidden; border:1px solid rgba(255,255,255,.16);
             background: linear-gradient(135deg, rgba(11,19,43,.96), rgba(28,37,65,.93)), radial-gradient(circle at top right, rgba(58,134,255,.35), transparent 34%);
@@ -152,17 +123,46 @@ def inject_enterprise_theme(mode: str) -> None:
         .panel h3 {{ margin-top:0; color:var(--fd-text); font-size:1.04rem; }}
         .muted {{ color:var(--fd-muted); }}
         .risk-pill {{ display:inline-flex; padding:6px 10px; border-radius:999px; color:white; font-weight:850; font-size:.78rem; }}
-        .side-card {{ border:1px solid rgba(148,163,184,.25); border-radius:8px; padding:13px; margin:12px 0; background:rgba(148,163,184,.08); }}
-        .side-title {{ font-weight:950; color:var(--fd-text); }}
-        .side-k {{ color:var(--fd-muted); font-size:.72rem; font-weight:850; text-transform:uppercase; margin-top:8px; }}
-        .side-v {{ color:var(--fd-text); font-weight:850; }}
         .timeline-item {{ border-left:3px solid var(--fd-accent); padding:0 0 16px 14px; margin-left:6px; }}
         .timeline-time {{ font-weight:950; color:var(--fd-text); }}
         .timeline-detail {{ color:var(--fd-muted); }}
+        .team-grid {{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:18px; }}
+        .team-card {{
+            position:relative; overflow:hidden; background:var(--fd-card); border:1px solid var(--fd-border);
+            border-radius:12px; padding:22px; box-shadow:0 16px 36px rgba(15,23,42,.08);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }}
+        .team-card:hover {{
+            transform:translateY(-3px); box-shadow:0 24px 52px rgba(15,23,42,.13);
+            border-color:rgba(58,134,255,.45);
+        }}
+        .team-card::before {{
+            content:""; position:absolute; inset:0 0 auto 0; height:4px;
+            background:linear-gradient(90deg, #3A86FF, #4361EE, #06D6A0);
+        }}
+        .team-avatar {{
+            width:56px; height:56px; border-radius:16px; display:grid; place-items:center;
+            color:white; font-weight:950; font-size:1rem;
+            background:linear-gradient(135deg, #3A86FF 0%, #4361EE 100%);
+            box-shadow:0 14px 26px rgba(58,134,255,.25); margin-bottom:16px;
+        }}
+        .team-name {{ color:var(--fd-text); font-size:1.28rem; line-height:1.15; font-weight:950; margin-bottom:6px; }}
+        .team-role {{ color:var(--fd-muted); font-size:.94rem; font-weight:780; margin-bottom:18px; }}
+        .team-link {{
+            display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 14px;
+            border-radius:12px; background:linear-gradient(135deg, #3A86FF 0%, #4361EE 100%);
+            color:#FFFFFF !important; text-decoration:none !important; font-weight:900;
+            box-shadow:0 12px 22px rgba(58,134,255,.22); transition:transform .18s ease, box-shadow .18s ease;
+        }}
+        .team-link:hover {{ transform:translateY(-1px); box-shadow:0 16px 30px rgba(58,134,255,.30); }}
         div[data-testid="stDataFrame"] {{ border-radius:8px; overflow:hidden; }}
         .stButton > button {{ border-radius:8px; font-weight:850; border:1px solid var(--fd-accent); background:var(--fd-accent); color:white; }}
         .stButton > button:hover {{ border-color:#2563EB; background:#2563EB; color:white; }}
-        @media(max-width: 900px) {{ .hero {{ padding:20px; }} .kpi {{ min-height:auto; }} }}
+        @media(max-width: 900px) {{
+            .hero {{ padding:20px; }}
+            .kpi {{ min-height:auto; }}
+            .team-grid {{ grid-template-columns: 1fr; }}
+        }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -226,31 +226,24 @@ def render_sidebar(cases: pd.DataFrame, navigation: list[str], gemini_model: str
     with st.sidebar:
         if Path("logo.png").exists():
             st.image("logo.png", use_container_width=True)
-        labels = {f"{NAV_ICONS.get(item, '•')}  {item}": item for item in navigation}
-        current = st.session_state.get("active_page", navigation[0])
-        current_label = next((label for label, value in labels.items() if value == current), next(iter(labels)))
-        page_label = st.radio(
+        if st.session_state.get("active_page") not in navigation:
+            st.session_state.active_page = navigation[0]
+        page = st.radio(
             "Navigation",
-            list(labels),
-            index=list(labels).index(current_label),
+            navigation,
+            format_func=lambda item: f"{NAV_ICONS.get(item, '.') }  {item}",
+            key="active_page",
             label_visibility="collapsed",
         )
-        page = labels[page_label]
-        st.session_state.active_page = page
-        api_key = default_api_key
-        regions = sorted(cases["region"].unique())
-        risk_levels = RISK_LEVELS
-        statuses = sorted(cases["status"].unique())
         min_date = cases["submitted_at"].dt.date.min()
         max_date = cases["submitted_at"].dt.date.max()
-        date_range = (min_date, max_date)
         return {
             "page": page,
-            "api_key": api_key,
-            "regions": regions,
-            "risk_levels": risk_levels,
-            "statuses": statuses,
-            "date_range": date_range,
+            "api_key": default_api_key,
+            "regions": sorted(cases["region"].unique()),
+            "risk_levels": RISK_LEVELS,
+            "statuses": sorted(cases["status"].unique()),
+            "date_range": (min_date, max_date),
         }
 
 

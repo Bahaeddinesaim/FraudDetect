@@ -40,6 +40,7 @@ NAVIGATION = [
     "Rapports",
     "Journal d'audit",
     "IA Responsable",
+    "Team de dev",
     "Administration",
     "Parametres",
 ]
